@@ -1,0 +1,58 @@
+:root {
+  --fundo: #e9ebed;
+  --painel: #ffffff;
+  --grafite: #262a2e;
+  --aco: #5d666e;
+  --brasa: #c4501b;
+  --erro: #a3271c;
+  --ok: #1f6b45;
+  --borda: #c9ced2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--fundo);
+  color: var(--grafite);
+}
+.topo {
+  background: var(--grafite);
+  color: #fff;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 4px solid var(--brasa);
+}
+.topo h1 { margin: 0; font-size: 1.5rem; }
+.topo p { margin: .2rem 0 0; color: #b8bfc5; }
+main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; display: grid; gap: 1.25rem; }
+.painel { background: var(--painel); border: 1px solid var(--borda); padding: 1.25rem; }
+.painel h2 { margin: 0 0 1rem; font-size: 1.1rem; }
+form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .85rem; }
+form.linha { display: flex; align-items: end; gap: .75rem; }
+label { display: grid; gap: .3rem; font-size: .9rem; color: var(--aco); }
+input {
+  padding: .55rem .6rem; font: inherit; color: var(--grafite);
+  border: 1px solid var(--borda); background: #fff;
+}
+input:focus-visible, button:focus-visible { outline: 3px solid var(--brasa); outline-offset: 1px; }
+.acoes { grid-column: 1 / -1; display: flex; gap: .6rem; }
+button {
+  padding: .55rem 1rem; font: inherit; cursor: pointer;
+  background: var(--brasa); color: #fff; border: 0;
+}
+button.sec { background: var(--aco); }
+button.perigo { background: var(--erro); }
+button:disabled { opacity: .6; cursor: wait; }
+.rolagem { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { padding: .6rem; text-align: left; border-bottom: 1px solid var(--borda); white-space: nowrap; }
+th { background: var(--fundo); }
+td.acoes-cel { display: flex; gap: .4rem; }
+td.acoes-cel button { padding: .3rem .7rem; font-size: .85rem; }
+.vazio { padding: 1rem; color: var(--aco); }
+#status { margin: 0; padding: .7rem 1rem; border-left: 4px solid var(--aco); background: #fff; }
+#status.ok { border-color: var(--ok); }
+#status.erro { border-color: var(--erro); }
+#detalhe { margin-top: 1rem; padding: 1rem; background: var(--fundo); border-left: 4px solid var(--brasa); }
+#detalhe dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: .3rem 1rem; }
+#detalhe dt { color: var(--aco); }
+#detalhe dd { margin: 0; }
