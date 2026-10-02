@@ -3,52 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DDA Metalúrgica · Painel de Pastilhas</title>
+  <meta name="description" content="Painel de controle de estoque de pastilhas da DDA Metalúrgica.">
+  <title>Estoque de pastilhas · DDA Metalúrgica</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <a class="pular" href="#estoque">Ir para o estoque</a>
+
   <header class="topo">
-    <h1>DDA Metalúrgica</h1>
-    <p>Estoque de pastilhas</p>
+    <div class="marca">
+      <strong>DDA Metalúrgica</strong>
+      <span>Controle de estoque</span>
+    </div>
+    <nav aria-label="Seções do painel">
+      <a href="#resumo">Resumo</a>
+      <a href="#estoque">Pastilhas</a>
+      <a href="#busca">Buscar por ID</a>
+    </nav>
   </header>
 
   <main>
-    <p id="status" role="status" hidden></p>
+    <p id="status" role="status" aria-live="polite" hidden></p>
 
-    <section class="painel" aria-labelledby="t-form">
-      <h2 id="t-form">Cadastrar pastilha</h2>
-      <form id="form-pastilha">
-        <input type="hidden" id="id">
-        <label>Nome <input id="nome" required></label>
-        <label>Código <input id="codigo" required></label>
-        <label>Quantidade <input id="quantidade" type="number" min="0" required></label>
-        <label>Categoria <input id="categoria" required></label>
-        <label>Fornecedor <input id="fornecedor" required></label>
-        <label>Preço (R$) <input id="preco" type="number" min="0" step="0.01" required></label>
-        <div class="acoes">
-          <button type="submit" id="btn-salvar">Cadastrar</button>
-          <button type="button" id="btn-cancelar" class="sec" hidden>Cancelar edição</button>
-        </div>
-      </form>
+    <section id="resumo" aria-labelledby="t-resumo">
+      <h2 id="t-resumo">Resumo</h2>
+      <dl class="indicadores">
+        <div><dt>Pastilhas cadastradas</dt><dd id="ind-total">–</dd></div>
+        <div><dt>Unidades em estoque</dt><dd id="ind-unidades">–</dd></div>
+        <div><dt>Com estoque baixo</dt><dd id="ind-baixo">–</dd></div>
+        <div><dt>Valor em estoque</dt><dd id="ind-valor">–</dd></div>
+      </dl>
     </section>
 
-    <section class="painel" aria-labelledby="t-busca">
+    <section id="busca" aria-labelledby="t-busca">
       <h2 id="t-busca">Buscar por ID</h2>
       <form id="form-busca" class="linha">
-        <label>ID <input id="busca-id" type="number" min="1" required></label>
+        <label for="busca-id">ID da pastilha</label>
+        <input id="busca-id" type="number" min="1" inputmode="numeric" required>
         <button type="submit">Buscar</button>
       </form>
-      <div id="detalhe" hidden></div>
+      <article id="detalhe" aria-live="polite" hidden></article>
     </section>
 
-    <section class="painel" aria-labelledby="t-lista">
-      <h2 id="t-lista">Todas as pastilhas</h2>
+    <section id="estoque" aria-labelledby="t-estoque">
+      <div class="cabecalho-secao">
+        <h2 id="t-estoque">Pastilhas</h2>
+        <div class="ferramentas">
+          <label for="filtro" class="so-leitor">Filtrar pastilhas</label>
+          <input id="filtro" type="search" placeholder="Filtrar por nome, código, categoria…">
+          <button type="button" id="btn-nova">Nova pastilha</button>
+        </div>
+      </div>
+
       <div class="rolagem">
         <table>
+          <caption class="so-leitor">Pastilhas cadastradas no estoque</caption>
           <thead>
             <tr>
-              <th>ID</th><th>Nome</th><th>Código</th><th>Qtd.</th>
-              <th>Categoria</th><th>Fornecedor</th><th>Preço</th><th>Ações</th>
+              <th scope="col">ID</th>
+              <th scope="col">Nome</th>
+              <th scope="col">Código</th>
+              <th scope="col">Categoria</th>
+              <th scope="col">Fornecedor</th>
+              <th scope="col" class="num">Qtd.</th>
+              <th scope="col" class="num">Preço</th>
+              <th scope="col">Situação</th>
+              <th scope="col">Ações</th>
             </tr>
           </thead>
           <tbody id="tabela"></tbody>
@@ -57,6 +77,62 @@
     </section>
   </main>
 
+  <footer class="rodape">
+    <p>Dados fornecidos pela API do mockapi.io. Estoque baixo: 10 unidades ou menos.</p>
+  </footer>
+
+  <dialog id="dlg-form" aria-labelledby="dlg-form-titulo">
+    <form id="form-pastilha">
+      <h2 id="dlg-form-titulo">Nova pastilha</h2>
+      <input type="hidden" id="f-id">
+
+      <div class="campo">
+        <label for="f-nome">Nome</label>
+        <input id="f-nome" name="nome" required maxlength="80" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="f-codigo">Código</label>
+        <input id="f-codigo" name="codigo" required maxlength="30" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="f-categoria">Categoria</label>
+        <input id="f-categoria" name="categoria" required maxlength="50" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="f-fornecedor">Fornecedor</label>
+        <input id="f-fornecedor" name="fornecedor" required maxlength="80" autocomplete="off">
+      </div>
+      <div class="par">
+        <div class="campo">
+          <label for="f-quantidade">Quantidade</label>
+          <input id="f-quantidade" name="quantidade" type="number" min="0" step="1" inputmode="numeric" required>
+        </div>
+        <div class="campo">
+          <label for="f-preco">Preço (R$)</label>
+          <input id="f-preco" name="preco" type="number" min="0" step="0.01" inputmode="decimal" required>
+        </div>
+      </div>
+
+      <p id="form-erro" class="erro" role="alert" hidden></p>
+
+      <div class="acoes">
+        <button type="button" id="btn-cancelar" class="sec">Cancelar</button>
+        <button type="submit" id="btn-salvar">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-excluir" aria-labelledby="dlg-excluir-titulo">
+    <h2 id="dlg-excluir-titulo">Excluir pastilha</h2>
+    <p id="excluir-texto"></p>
+    <p id="excluir-erro" class="erro" role="alert" hidden></p>
+    <div class="acoes">
+      <button type="button" id="btn-excluir-cancelar" class="sec">Cancelar</button>
+      <button type="button" id="btn-excluir-confirmar" class="perigo">Excluir</button>
+    </div>
+  </dialog>
+
+  <script src="api.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
