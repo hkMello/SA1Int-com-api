@@ -27,14 +27,6 @@ const PastilhasAPI = {
     return requisicao(`${API_URL}/${encodeURIComponent(id)}`);
   },
 
-  // POST
-  criar(dados) {
-    return requisicao(API_URL, {
-      method: "POST",
-      headers: CABECALHO_JSON,
-      body: JSON.stringify(dados),
-    });
-  },
 
   // PUT
   atualizar(id, dados) {
