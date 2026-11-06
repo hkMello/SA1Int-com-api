@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Painel de controle de estoque de pastilhas da DDA Metalúrgica.">
-  <title>Estoque de pastilhas · NEXUS</title>
+  <title>Estoque de pastilhas · DDA Metalúrgica</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,16 +12,18 @@
 
   <header class="topo">
     <div class="marca">
-      <strong>NEXUS</strong>
+      <strong>DDA Metalúrgica</strong>
       <span>Controle de estoque</span>
     </div>
     <nav aria-label="Seções do painel">
       <a href="#resumo">Resumo</a>
       <a href="#estoque">Pastilhas</a>
       <a href="#busca">Buscar por ID</a>
+      <a href="#usuarios" id="nav-usuarios" hidden>Usuários</a>
     </nav>
     <div class="sessao">
       <span>Olá, <strong id="usuario-nome"></strong></span>
+      <span id="usuario-papel" class="selo"></span>
       <button type="button" id="btn-sair" class="sec">Sair</button>
     </div>
   </header>
@@ -76,6 +78,31 @@
             </tr>
           </thead>
           <tbody id="tabela"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="usuarios" aria-labelledby="t-usuarios" hidden>
+      <div class="cabecalho-secao">
+        <h2 id="t-usuarios">Usuários</h2>
+        <div class="ferramentas">
+          <button type="button" id="btn-novo-usuario">Novo usuário</button>
+        </div>
+      </div>
+
+      <div class="rolagem">
+        <table>
+          <caption class="so-leitor">Usuários e permissões</caption>
+          <thead>
+            <tr>
+              <th scope="col">Nome</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">Papel</th>
+              <th scope="col">Pode fazer</th>
+              <th scope="col">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-usuarios"></tbody>
         </table>
       </div>
     </section>
@@ -136,8 +163,52 @@
     </div>
   </dialog>
 
+  <dialog id="dlg-usuario" aria-labelledby="dlg-usuario-titulo">
+    <form id="form-usuario">
+      <h2 id="dlg-usuario-titulo">Novo usuário</h2>
+      <input type="hidden" id="u-id">
+
+      <div id="u-novo">
+        <div class="campo">
+          <label for="u-nome">Nome</label>
+          <input id="u-nome" required maxlength="80" autocomplete="off">
+        </div>
+        <div class="campo">
+          <label for="u-email">E-mail</label>
+          <input id="u-email" type="email" required autocomplete="off">
+        </div>
+        <div class="campo">
+          <label for="u-senha">Senha inicial</label>
+          <input id="u-senha" type="password" required minlength="6" autocomplete="new-password">
+        </div>
+      </div>
+      <p id="u-resumo" class="resumo-usuario" hidden></p>
+
+      <div class="campo">
+        <label for="u-papel">Papel</label>
+        <select id="u-papel">
+          <option value="usuario">Usuário</option>
+          <option value="admin">Administrador (pode tudo)</option>
+        </select>
+      </div>
+
+      <fieldset class="checks">
+        <legend>Permissões</legend>
+        <div id="u-permissoes"></div>
+      </fieldset>
+
+      <p id="u-erro" class="erro" role="alert" hidden></p>
+
+      <div class="acoes">
+        <button type="button" id="u-cancelar" class="sec">Cancelar</button>
+        <button type="submit" id="u-salvar">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="api.js"></script>
   <script src="auth.js"></script>
   <script src="app.js"></script>
+  <script src="usuarios.js"></script>
 </body>
 </html>
