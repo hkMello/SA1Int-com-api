@@ -1,6 +1,11 @@
-const MIN_ESTOQUE = 10; 
+const MIN_ESTOQUE = 10;
+
+const usuario = Auth.exigirLogin();
+if (!usuario) throw new Error("Sessão ausente: redirecionando para o login.");
 
 const $ = (id) => document.getElementById(id);
+$("usuario-nome").textContent = usuario.nome;
+$("btn-sair").addEventListener("click", Auth.sair);
 const tabela = $("tabela");
 const statusEl = $("status");
 const detalhe = $("detalhe");
@@ -42,7 +47,6 @@ function mostrarStatus(mensagem, tipo = "ok") {
 
 const estoqueBaixo = (p) => Number(p.quantidade) <= MIN_ESTOQUE;
 
-// renderização 
 function linhaMensagem(texto, botao) {
   const celula = el("td", { class: "mensagem", colSpan: 9, text: texto });
   if (botao) celula.append(" ", botao);
@@ -111,7 +115,7 @@ function atualizarResumo() {
   );
 }
 
-// GET geral 
+
 async function carregar() {
   tabela.replaceChildren(linhaMensagem("Carregando pastilhas…"));
   try {
@@ -127,7 +131,6 @@ async function carregar() {
   }
 }
 
-// GET por id
 $("form-busca").addEventListener("submit", async (evento) => {
   evento.preventDefault();
   const id = $("busca-id").value;
@@ -152,7 +155,6 @@ $("form-busca").addEventListener("submit", async (evento) => {
   }
 });
 
-// POST e PUT (formulário)
 const campos = {
   id: $("f-id"), nome: $("f-nome"), codigo: $("f-codigo"),
   categoria: $("f-categoria"), fornecedor: $("f-fornecedor"),
@@ -215,7 +217,6 @@ formPastilha.addEventListener("submit", async (evento) => {
 $("btn-cancelar").addEventListener("click", () => dlgForm.close());
 $("btn-nova").addEventListener("click", () => abrirFormulario(null));
 
-// DELETE 
 function pedirExclusao(p) {
   alvoExclusao = p;
   $("excluir-texto").textContent = `Excluir "${p.nome}" (código ${p.codigo})? Esta ação não pode ser desfeita.`;
@@ -244,7 +245,6 @@ $("btn-excluir-confirmar").addEventListener("click", async () => {
 
 $("btn-excluir-cancelar").addEventListener("click", () => dlgExcluir.close());
 
-// filtro
 $("filtro").addEventListener("input", (evento) => {
   filtro = evento.target.value;
   renderizar();
