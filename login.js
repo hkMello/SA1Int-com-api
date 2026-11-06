@@ -1,31 +1,33 @@
-// Tela de login e cadastro. Depende de api.js e auth.js.
-
 if (Auth.usuarioAtual()) location.replace(PAGINA_PAINEL);
 
 const $ = (id) => document.getElementById(id);
 const formLogin = $("form-login");
 const formCadastro = $("form-cadastro");
-const abaEntrar = $("aba-entrar");
-const abaCadastro = $("aba-cadastro");
-
-function mostrarAba(cadastro) {
-  formLogin.hidden = cadastro;
-  formCadastro.hidden = !cadastro;
-  abaEntrar.setAttribute("aria-pressed", String(!cadastro));
-  abaCadastro.setAttribute("aria-pressed", String(cadastro));
-  $("t-auth").textContent = cadastro ? "Criar conta" : "Entrar";
-  $("login-erro").hidden = true;
-  $("cadastro-erro").hidden = true;
-  (cadastro ? $("c-nome") : $("l-email")).focus();
-}
-
-abaEntrar.addEventListener("click", () => mostrarAba(false));
-abaCadastro.addEventListener("click", () => mostrarAba(true));
+const aviso = $("aviso");
 
 function mostrarErro(id, mensagem) {
   const erro = $(id);
   erro.textContent = mensagem;
   erro.hidden = false;
+}
+
+async function prepararTela() {
+  try {
+    if (await Auth.primeiroAcesso()) {
+      $("t-auth").textContent = "Primeiro acesso";
+      aviso.textContent = "Ainda não há usuários. A conta criada agora será o administrador do sistema.";
+      formCadastro.hidden = false;
+      $("c-nome").focus();
+    } else {
+      aviso.textContent = "Não tem conta? Peça ao administrador para criar uma para você.";
+      formLogin.hidden = false;
+      $("l-email").focus();
+    }
+  } catch (erro) {
+    aviso.textContent = `Não foi possível verificar o acesso. ${erro.message}`;
+    aviso.className = "erro";
+    formLogin.hidden = false;
+  }
 }
 
 formLogin.addEventListener("submit", async (evento) => {
@@ -59,7 +61,7 @@ formCadastro.addEventListener("submit", async (evento) => {
   const botao = $("btn-cadastro");
   botao.disabled = true;
   try {
-    await Auth.cadastrar({ nome: $("c-nome").value, email: $("c-email").value, senha });
+    await Auth.criarPrimeiroAdmin({ nome: $("c-nome").value, email: $("c-email").value, senha });
     location.replace(PAGINA_PAINEL);
   } catch (erro) {
     mostrarErro("cadastro-erro", erro.message);
@@ -67,3 +69,5 @@ formCadastro.addEventListener("submit", async (evento) => {
     botao.disabled = false;
   }
 });
+
+prepararTela();
