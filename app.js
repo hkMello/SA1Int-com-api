@@ -1,11 +1,21 @@
 const MIN_ESTOQUE = 10;
 
-const usuario = Auth.exigirLogin();
-if (!usuario) throw new Error("Sessão ausente: redirecionando para o login.");
+if (!Auth.exigirLogin()) throw new Error("Sessão ausente: redirecionando para o login.");
 
 const $ = (id) => document.getElementById(id);
-$("usuario-nome").textContent = usuario.nome;
 $("btn-sair").addEventListener("click", Auth.sair);
+
+function aplicarSessao() {
+  const u = Auth.usuarioAtual();
+  $("usuario-nome").textContent = u.nome;
+  $("usuario-papel").textContent = PAPEIS[u.papel];
+  $("btn-nova").hidden = !Auth.pode("criar");
+}
+
+function semPermissao() {
+  mostrarStatus("Você não tem permissão para essa ação.", "erro");
+}
+
 const tabela = $("tabela");
 const statusEl = $("status");
 const detalhe = $("detalhe");
@@ -47,10 +57,30 @@ function mostrarStatus(mensagem, tipo = "ok") {
 
 const estoqueBaixo = (p) => Number(p.quantidade) <= MIN_ESTOQUE;
 
+// renderização 
 function linhaMensagem(texto, botao) {
   const celula = el("td", { class: "mensagem", colSpan: 9, text: texto });
   if (botao) celula.append(" ", botao);
   return el("tr", {}, celula);
+}
+
+function acoesPastilha(p) {
+  const botoes = [];
+  if (Auth.pode("editar")) {
+    botoes.push(el("button", {
+      type: "button", class: "link", text: "Editar",
+      "aria-label": `Editar ${p.nome}`,
+      onclick: () => abrirFormulario(p),
+    }));
+  }
+  if (Auth.pode("excluir")) {
+    botoes.push(el("button", {
+      type: "button", class: "link perigo", text: "Excluir",
+      "aria-label": `Excluir ${p.nome}`,
+      onclick: () => pedirExclusao(p),
+    }));
+  }
+  return botoes.length ? botoes : [el("span", { class: "suave", text: "—" })];
 }
 
 function linhaPastilha(p) {
@@ -67,18 +97,7 @@ function linhaPastilha(p) {
       class: baixo ? "selo baixo" : "selo",
       text: baixo ? "Estoque baixo" : "Normal",
     })),
-    el("td", { class: "acoes-cel" },
-      el("button", {
-        type: "button", class: "link", text: "Editar",
-        "aria-label": `Editar ${p.nome}`,
-        onclick: () => abrirFormulario(p),
-      }),
-      el("button", {
-        type: "button", class: "link perigo", text: "Excluir",
-        "aria-label": `Excluir ${p.nome}`,
-        onclick: () => pedirExclusao(p),
-      }),
-    ),
+    el("td", { class: "acoes-cel" }, acoesPastilha(p)),
   );
 }
 
@@ -114,7 +133,6 @@ function atualizarResumo() {
     pastilhas.reduce((s, p) => s + Number(p.quantidade || 0) * Number(p.preco || 0), 0),
   );
 }
-
 
 async function carregar() {
   tabela.replaceChildren(linhaMensagem("Carregando pastilhas…"));
@@ -162,6 +180,7 @@ const campos = {
 };
 
 function abrirFormulario(p) {
+  if (!Auth.pode(p ? "editar" : "criar")) return semPermissao();
   formPastilha.reset();
   $("form-erro").hidden = true;
   campos.id.value = p ? p.id : "";
@@ -189,6 +208,7 @@ function lerFormulario() {
 formPastilha.addEventListener("submit", async (evento) => {
   evento.preventDefault();
   const id = campos.id.value;
+  if (!Auth.pode(id ? "editar" : "criar")) return semPermissao();
   const dados = lerFormulario();
   const botao = $("btn-salvar");
   botao.disabled = true;
@@ -218,6 +238,7 @@ $("btn-cancelar").addEventListener("click", () => dlgForm.close());
 $("btn-nova").addEventListener("click", () => abrirFormulario(null));
 
 function pedirExclusao(p) {
+  if (!Auth.pode("excluir")) return semPermissao();
   alvoExclusao = p;
   $("excluir-texto").textContent = `Excluir "${p.nome}" (código ${p.codigo})? Esta ação não pode ser desfeita.`;
   $("excluir-erro").hidden = true;
@@ -226,6 +247,7 @@ function pedirExclusao(p) {
 
 $("btn-excluir-confirmar").addEventListener("click", async () => {
   if (!alvoExclusao) return;
+  if (!Auth.pode("excluir")) return semPermissao();
   const botao = $("btn-excluir-confirmar");
   botao.disabled = true;
   try {
@@ -250,4 +272,11 @@ $("filtro").addEventListener("input", (evento) => {
   renderizar();
 });
 
-carregar();
+aplicarSessao();
+document.addEventListener("DOMContentLoaded", async () => {
+  await Auth.atualizarSessao();
+  if (!Auth.usuarioAtual()) return;
+  aplicarSessao();
+  document.dispatchEvent(new CustomEvent("sessao-pronta"));
+  carregar();
+});
