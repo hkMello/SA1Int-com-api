@@ -25,6 +25,7 @@ async function requisicao(url, opcoes) {
 const CABECALHO_JSON = { "Content-Type": "application/json" };
 
 const PastilhasAPI = {
+  // GET
   listar() {
     return requisicao(API_URL);
   },
@@ -33,6 +34,7 @@ const PastilhasAPI = {
     return requisicao(`${API_URL}/${encodeURIComponent(id)}`);
   },
 
+  // POST
   criar(dados) {
     return requisicao(API_URL, {
       method: "POST",
@@ -41,6 +43,7 @@ const PastilhasAPI = {
     });
   },
 
+  // PUT
   atualizar(id, dados) {
     return requisicao(`${API_URL}/${encodeURIComponent(id)}`, {
       method: "PUT",
@@ -49,12 +52,37 @@ const PastilhasAPI = {
     });
   },
 
+  // DELETE
   excluir(id) {
     return requisicao(`${API_URL}/${encodeURIComponent(id)}`, { method: "DELETE" });
   },
 };
 
+// Recurso "usuarios" (crie no mockapi.io, todos os campos como String:
+// nome, email, salt, senhaHash, papel, permissoes, criadoEm)
 const UsuariosAPI = {
+  async listar() {
+    try {
+      return await requisicao(USUARIOS_URL);
+    } catch (erro) {
+      if (erro.status === 404) await garantirRecursoUsuarios();
+      throw erro;
+    }
+  },
+
+  buscarPorId(id) {
+    return requisicao(`${USUARIOS_URL}/${encodeURIComponent(id)}`);
+  },
+
+  // Envia o registro completo para não perder salt/senhaHash.
+  atualizar(id, dados) {
+    return requisicao(`${USUARIOS_URL}/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: CABECALHO_JSON,
+      body: JSON.stringify(dados),
+    });
+  },
+
   async buscarPorEmail(email) {
     let lista;
     try {
@@ -81,6 +109,7 @@ const UsuariosAPI = {
   },
 };
 
+// Lança um erro claro se o recurso "usuarios" não existir no mockapi.io.
 async function garantirRecursoUsuarios() {
   try {
     await requisicao(USUARIOS_URL);
