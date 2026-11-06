@@ -11,8 +11,13 @@ async function requisicao(url, opcoes) {
   }
 
   if (!resposta.ok) {
-    if (resposta.status === 404) throw new Error("Registro não encontrado.");
-    throw new Error(`A API respondeu com erro (HTTP ${resposta.status}).`);
+    const erro = new Error(
+      resposta.status === 404
+        ? "Registro não encontrado."
+        : `A API respondeu com erro (HTTP ${resposta.status}).`,
+    );
+    erro.status = resposta.status;
+    throw erro;
   }
   return resposta.json();
 }
@@ -20,7 +25,6 @@ async function requisicao(url, opcoes) {
 const CABECALHO_JSON = { "Content-Type": "application/json" };
 
 const PastilhasAPI = {
-  // GET
   listar() {
     return requisicao(API_URL);
   },
@@ -29,7 +33,6 @@ const PastilhasAPI = {
     return requisicao(`${API_URL}/${encodeURIComponent(id)}`);
   },
 
-  // POST
   criar(dados) {
     return requisicao(API_URL, {
       method: "POST",
@@ -38,7 +41,6 @@ const PastilhasAPI = {
     });
   },
 
-  // PUT
   atualizar(id, dados) {
     return requisicao(`${API_URL}/${encodeURIComponent(id)}`, {
       method: "PUT",
@@ -47,33 +49,45 @@ const PastilhasAPI = {
     });
   },
 
-  // DELETE
   excluir(id) {
     return requisicao(`${API_URL}/${encodeURIComponent(id)}`, { method: "DELETE" });
   },
 };
 
-// Recurso "usuarios" (crie no mockapi.io: nome, email, salt, senhaHash, criadoEm)
 const UsuariosAPI = {
-  // O filtro do mockapi faz busca parcial, então a comparação exata é feita aqui.
   async buscarPorEmail(email) {
     let lista;
     try {
       lista = await requisicao(`${USUARIOS_URL}?email=${encodeURIComponent(email)}`);
     } catch (erro) {
-      if (erro.message === "Registro não encontrado.") {
-        throw new Error('O recurso "usuarios" ainda não existe no mockapi.io. Crie-o com os campos nome, email, salt, senhaHash e criadoEm.');
-      }
-      throw erro;
+      if (erro.status !== 404) throw erro;
+      await garantirRecursoUsuarios();
+      return null;
     }
     return lista.find((u) => String(u.email).toLowerCase() === email.toLowerCase()) ?? null;
   },
 
-  criar(dados) {
-    return requisicao(USUARIOS_URL, {
-      method: "POST",
-      headers: CABECALHO_JSON,
-      body: JSON.stringify(dados),
-    });
+  async criar(dados) {
+    try {
+      return await requisicao(USUARIOS_URL, {
+        method: "POST",
+        headers: CABECALHO_JSON,
+        body: JSON.stringify(dados),
+      });
+    } catch (erro) {
+      if (erro.status === 404) await garantirRecursoUsuarios();
+      throw erro;
+    }
   },
 };
+
+async function garantirRecursoUsuarios() {
+  try {
+    await requisicao(USUARIOS_URL);
+  } catch (erro) {
+    if (erro.status === 404) {
+      throw new Error('O recurso "usuarios" não foi encontrado no mockapi.io. Confira se o nome é exatamente "usuarios" (minúsculas) no projeto api-dda.');
+    }
+    throw erro;
+  }
+}
