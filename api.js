@@ -1,4 +1,6 @@
-const API_URL = "https://6abaf4585b549d818d62bc4d.mockapi.io/api-dda/pastilhas";
+const API_BASE = "https://6abaf4585b549d818d62bc4d.mockapi.io/api-dda";
+const API_URL = `${API_BASE}/pastilhas`;
+const USUARIOS_URL = `${API_BASE}/usuarios`;
 
 async function requisicao(url, opcoes) {
   let resposta;
@@ -48,5 +50,30 @@ const PastilhasAPI = {
   // DELETE
   excluir(id) {
     return requisicao(`${API_URL}/${encodeURIComponent(id)}`, { method: "DELETE" });
+  },
+};
+
+// Recurso "usuarios" (crie no mockapi.io: nome, email, salt, senhaHash, criadoEm)
+const UsuariosAPI = {
+  // O filtro do mockapi faz busca parcial, então a comparação exata é feita aqui.
+  async buscarPorEmail(email) {
+    let lista;
+    try {
+      lista = await requisicao(`${USUARIOS_URL}?email=${encodeURIComponent(email)}`);
+    } catch (erro) {
+      if (erro.message === "Registro não encontrado.") {
+        throw new Error('O recurso "usuarios" ainda não existe no mockapi.io. Crie-o com os campos nome, email, salt, senhaHash e criadoEm.');
+      }
+      throw erro;
+    }
+    return lista.find((u) => String(u.email).toLowerCase() === email.toLowerCase()) ?? null;
+  },
+
+  criar(dados) {
+    return requisicao(USUARIOS_URL, {
+      method: "POST",
+      headers: CABECALHO_JSON,
+      body: JSON.stringify(dados),
+    });
   },
 };

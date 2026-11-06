@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Acesso ao painel de estoque da DDA Metalúrgica.">
+  <title>Entrar · DDA Metalúrgica</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="pagina-auth">
+  <main class="auth">
+    <header class="marca">
+      <strong>DDA Metalúrgica</strong>
+      <span>Controle de estoque</span>
+    </header>
+
+    <section class="cartao" aria-labelledby="t-auth">
+      <h1 id="t-auth">Entrar</h1>
+
+      <div class="abas" role="group" aria-label="Escolha entre entrar e criar conta">
+        <button type="button" id="aba-entrar" class="aba" aria-pressed="true">Entrar</button>
+        <button type="button" id="aba-cadastro" class="aba" aria-pressed="false">Criar conta</button>
+      </div>
+
+      <form id="form-login" novalidate>
+        <div class="campo">
+          <label for="l-email">E-mail</label>
+          <input id="l-email" name="email" type="email" required autocomplete="username">
+        </div>
+        <div class="campo">
+          <label for="l-senha">Senha</label>
+          <input id="l-senha" name="senha" type="password" required autocomplete="current-password">
+        </div>
+        <p id="login-erro" class="erro" role="alert" hidden></p>
+        <button type="submit" id="btn-login" class="cheio">Entrar</button>
+      </form>
+
+      <form id="form-cadastro" novalidate hidden>
+        <div class="campo">
+          <label for="c-nome">Nome</label>
+          <input id="c-nome" name="nome" required maxlength="80" autocomplete="name">
+        </div>
+        <div class="campo">
+          <label for="c-email">E-mail</label>
+          <input id="c-email" name="email" type="email" required autocomplete="username">
+        </div>
+        <div class="campo">
+          <label for="c-senha">Senha</label>
+          <input id="c-senha" name="senha" type="password" required minlength="6" autocomplete="new-password" aria-describedby="c-ajuda">
+          <small id="c-ajuda">Mínimo de 6 caracteres.</small>
+        </div>
+        <div class="campo">
+          <label for="c-confirma">Confirmar senha</label>
+          <input id="c-confirma" name="confirma" type="password" required autocomplete="new-password">
+        </div>
+        <p id="cadastro-erro" class="erro" role="alert" hidden></p>
+        <button type="submit" id="btn-cadastro" class="cheio">Criar conta</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>
