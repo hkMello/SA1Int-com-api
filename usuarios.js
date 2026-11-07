@@ -1,6 +1,3 @@
-// Gestão de usuários: só o administrador vê e usa esta área.
-// Depende de api.js, auth.js e app.js ($, el, mostrarStatus).
-
 const tabelaUsuarios = $("tabela-usuarios");
 const dlgUsuario = $("dlg-usuario");
 const formUsuario = $("form-usuario");
@@ -8,7 +5,7 @@ const caixasPermissao = $("u-permissoes");
 
 let listaUsuarios = [];
 
-// uma caixa de seleção para cada permissão
+
 for (const p of PERMISSOES) {
   caixasPermissao.append(
     el("label", { class: "check" },
@@ -75,7 +72,6 @@ async function carregarUsuarios() {
   }
 }
 
-// Administrador tem tudo marcado e travado.
 function sincronizarPapel() {
   const admin = $("u-papel").value === "admin";
   for (const c of caixas()) {
@@ -85,14 +81,12 @@ function sincronizarPapel() {
 }
 $("u-papel").addEventListener("change", sincronizarPapel);
 
-// u === null abre o formulário de novo usuário; senão, gerencia o usuário escolhido.
 function abrirUsuario(u) {
   if (!Auth.ehAdmin()) return semPermissao();
   formUsuario.reset();
   $("u-erro").hidden = true;
   $("u-id").value = u ? u.id : "";
 
-  // campos de cadastro só no modo "novo" (e só aí são obrigatórios)
   $("u-novo").hidden = Boolean(u);
   for (const id of ["u-nome", "u-email", "u-senha"]) $(id).required = !u;
   $("u-resumo").hidden = !u;
@@ -108,7 +102,6 @@ function abrirUsuario(u) {
   (u ? $("u-papel") : $("u-nome")).focus();
 }
 
-// Impede que o sistema fique sem nenhum administrador.
 async function garantirOutroAdmin(idIgnorado) {
   const todos = await UsuariosAPI.listar();
   const outros = todos.filter((u) => u.papel === "admin" && String(u.id) !== String(idIgnorado));
@@ -139,7 +132,7 @@ formUsuario.addEventListener("submit", async (evento) => {
       });
       dlgUsuario.close();
       if (String(id) === String(Auth.usuarioAtual().id)) {
-        location.reload(); // o próprio admin mudou: recarrega para refletir o novo acesso
+        location.reload();
         return;
       }
       await carregarUsuarios();
