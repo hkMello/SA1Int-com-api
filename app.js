@@ -2,8 +2,8 @@ const MIN_ESTOQUE = 10;
 
 if (!Auth.exigirLogin()) throw new Error("Sessão ausente: redirecionando para o login.");
 
-const $ = (id) => document.getElementById(id);
-$("btn-sair").addEventListener("click", Auth.sair);
+const btnSair = document.getElementById("btn-sair");
+btnSair.addEventListener("click", Auth.sair);
 
 function aplicarSessao() {
   const u = Auth.usuarioAtual();
