@@ -40,19 +40,21 @@ function linhaMensagemUsuarios(texto, botao) {
 function linhaUsuario(u) {
   const eu = String(u.id) === String(Auth.usuarioAtual().id);
   return el("tr", {},
-    el("td", { text: eu ? `${u.nome} (você)` : u.nome }),
-    el("td", { text: u.email }),
-    el("td", {}, el("span", {
+    el("td", { "data-label": "Nome", text: eu ? `${u.nome} (você)` : u.nome }),
+    el("td", { "data-label": "E-mail", text: u.email }),
+    el("td", { "data-label": "Papel" }, el("span", {
       class: u.papel === "admin" ? "selo" : "selo suave-selo",
       text: PAPEIS[u.papel === "admin" ? "admin" : "usuario"],
     })),
-    el("td", { class: "quebra", text: resumoPermissoes(u) }),
-    el("td", { class: "acoes-cel" },
-      el("button", {
-        type: "button", class: "link", text: "Gerenciar",
-        "aria-label": `Gerenciar ${u.nome}`,
-        onclick: () => abrirUsuario(u),
-      }),
+    el("td", { class: "quebra", "data-label": "Pode fazer", text: resumoPermissoes(u) }),
+    el("td", { class: "acoes-cel", "data-label": "Ações" },
+      el("div", { class: "acoes-linha" },
+        el("button", {
+          type: "button", class: "link", text: "Gerenciar",
+          "aria-label": `Gerenciar ${u.nome}`,
+          onclick: () => abrirUsuario(u),
+        }),
+      ),
     ),
   );
 }
