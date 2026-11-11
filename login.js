@@ -1,6 +1,5 @@
 if (Auth.usuarioAtual()) location.replace(PAGINA_PAINEL);
 
-const $ = (id) => document.getElementById(id);
 const formLogin = $("form-login");
 const formCadastro = $("form-cadastro");
 const aviso = $("aviso");
