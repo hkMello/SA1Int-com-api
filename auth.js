@@ -50,7 +50,7 @@ const Auth = {
   pode(acao) {
     const usuario = Auth.usuarioAtual();
     if (!usuario) return false;
-    return usuario.papel === "admin" || usuario.permissoes.includes(acao);
+    return usuario.papel === "admin" || (usuario.permissoes ?? []).includes(acao);
   },
 
   async atualizarSessao() {
