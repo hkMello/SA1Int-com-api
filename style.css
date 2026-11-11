@@ -124,7 +124,7 @@ tbody tr:last-child td { border-bottom: 0; }
 th { font-size: .8rem; font-weight: 500; color: var(--suave); }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 tbody tr:hover { background: var(--fundo); }
-.acoes-cel { display: flex; gap: .4rem; }
+.acoes-linha { display: flex; flex-wrap: wrap; gap: .4rem; }
 td.mensagem { white-space: normal; text-align: center; color: var(--suave); padding: 2rem 1rem; }
 
 .selo {
@@ -149,10 +149,6 @@ dialog h2 { font-size: 1.1rem; }
 .rodape { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem 2rem; color: var(--suave); font-size: .85rem; }
 .rodape p { margin: 0; }
 
-@media (max-width: 560px) {
-  .ferramentas input { min-width: 0; width: 100%; }
-  .par { grid-template-columns: 1fr; }
-}
 
 .pagina-auth { min-height: 100vh; display: grid; place-items: center; padding: 1.5rem; }
 .auth { width: min(420px, 100%); display: grid; gap: 1.25rem; }
@@ -180,3 +176,74 @@ fieldset.checks legend { padding: 0 .3rem; font-size: .85rem; color: var(--suave
 .check { display: flex; align-items: center; gap: .5rem; padding: .25rem 0; }
 .check input { width: auto; }
 .resumo-usuario { margin: 0 0 1rem; color: var(--suave); }
+
+/* diálogos longos rolam em telas baixas */
+dialog { max-height: calc(100dvh - 2rem); overflow-y: auto; }
+
+/* ---------- responsivo ---------- */
+
+/* tablet */
+@media (max-width: 860px) {
+  .topo { padding: .85rem 1rem; }
+  .topo nav { order: 3; width: 100%; overflow-x: auto; gap: 1rem; padding-bottom: .15rem; }
+  .topo nav a { white-space: nowrap; }
+  main { padding: 1rem; gap: 1.5rem; }
+  .rodape { padding: 0 1rem 1.5rem; }
+}
+
+/* celular: tabelas viram cartões */
+@media (max-width: 720px) {
+  .topo { gap: .6rem 1rem; }
+  .sessao { flex-wrap: wrap; gap: .5rem; }
+
+  .indicadores { grid-template-columns: repeat(2, 1fr); }
+  .indicadores dd { font-size: 1.25rem; }
+
+  .cabecalho-secao { align-items: stretch; }
+  .ferramentas { width: 100%; }
+  .ferramentas input { flex: 1 1 100%; min-width: 0; }
+  .ferramentas button { flex: 1 1 auto; }
+
+  .linha input { flex: 1 1 8rem; min-width: 0; }
+
+  .rolagem { overflow: visible; background: none; border: 0; }
+  table, tbody, tr, td { display: block; }
+  thead {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  tbody tr {
+    background: var(--superficie); border: 1px solid var(--linha);
+    border-radius: var(--raio); margin-bottom: .75rem; padding: .35rem .9rem;
+  }
+  tbody tr:hover { background: var(--superficie); }
+  td {
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding: .5rem 0; text-align: right; white-space: normal; overflow-wrap: anywhere;
+  }
+  td::before {
+    content: attr(data-label); flex-shrink: 0;
+    color: var(--suave); font-size: .8rem; text-align: left;
+  }
+  tbody tr:last-child td { border-bottom: 1px solid var(--linha); }
+  tbody tr td:last-child { border-bottom: 0; }
+  td.quebra { min-width: 0; }
+  td.mensagem { display: block; text-align: center; padding: 1.5rem .5rem; }
+  td.mensagem::before { content: none; }
+  .acoes-linha { justify-content: flex-end; }
+}
+
+/* celular pequeno */
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .par { grid-template-columns: 1fr; }
+  dialog { padding: 1.1rem; }
+  .acoes { flex-direction: column-reverse; }
+  .acoes button { width: 100%; }
+  #detalhe dl { grid-template-columns: 1fr; gap: 0; }
+  #detalhe dd { margin-bottom: .5rem; }
+  input, select { font-size: 16px; } /* evita zoom automático no iOS */
+  button { min-height: 2.75rem; }
+  button.link { min-height: 2.25rem; }
+  .pagina-auth { padding: 1rem; }
+}
