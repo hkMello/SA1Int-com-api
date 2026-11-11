@@ -28,18 +28,6 @@ let filtro = "";
 let alvoExclusao = null;
 let temporizadorStatus;
 
-function el(tag, props = {}, ...filhos) {
-  const no = document.createElement(tag);
-  for (const [chave, valor] of Object.entries(props)) {
-    if (chave === "class") no.className = valor;
-    else if (chave === "text") no.textContent = valor;
-    else if (chave.startsWith("aria-")) no.setAttribute(chave, valor);
-    else no[chave] = valor;
-  }
-  no.append(...filhos.flat());
-  return no;
-}
-
 const brl = (v) =>
   Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -85,19 +73,22 @@ function acoesPastilha(p) {
 
 function linhaPastilha(p) {
   const baixo = estoqueBaixo(p);
+  // data-label alimenta o layout em cartões no celular (ver style.css).
   return el("tr", {},
-    el("td", { text: p.id }),
-    el("td", { text: p.nome }),
-    el("td", { text: p.codigo }),
-    el("td", { text: p.categoria }),
-    el("td", { text: p.fornecedor }),
-    el("td", { class: "num", text: num(p.quantidade) }),
-    el("td", { class: "num", text: brl(p.preco) }),
-    el("td", {}, el("span", {
+    el("td", { "data-label": "ID", text: p.id }),
+    el("td", { "data-label": "Nome", text: p.nome }),
+    el("td", { "data-label": "Código", text: p.codigo }),
+    el("td", { "data-label": "Categoria", text: p.categoria }),
+    el("td", { "data-label": "Fornecedor", text: p.fornecedor }),
+    el("td", { class: "num", "data-label": "Qtd.", text: num(p.quantidade) }),
+    el("td", { class: "num", "data-label": "Preço", text: brl(p.preco) }),
+    el("td", { "data-label": "Situação" }, el("span", {
       class: baixo ? "selo baixo" : "selo",
       text: baixo ? "Estoque baixo" : "Normal",
     })),
-    el("td", { class: "acoes-cel" }, acoesPastilha(p)),
+    el("td", { class: "acoes-cel", "data-label": "Ações" },
+      el("div", { class: "acoes-linha" }, acoesPastilha(p)),
+    ),
   );
 }
 
@@ -272,11 +263,18 @@ $("filtro").addEventListener("input", (evento) => {
   renderizar();
 });
 
-aplicarSessao();
-document.addEventListener("DOMContentLoaded", async () => {
+async function iniciar() {
   await Auth.atualizarSessao();
   if (!Auth.usuarioAtual()) return;
   aplicarSessao();
   document.dispatchEvent(new CustomEvent("sessao-pronta"));
   carregar();
-});
+}
+
+aplicarSessao();
+// Os scripts ficam no fim do <body>, mas não dependemos disso.
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", iniciar);
+} else {
+  iniciar();
+}
