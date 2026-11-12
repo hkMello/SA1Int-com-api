@@ -5,9 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Acesso ao painel de estoque da DDA Metalúrgica.">
   <title>Entrar · NEXUS</title>
+  <script>
+    try {
+      var t = localStorage.getItem("dda_tema");
+      if (t !== "claro" && t !== "escuro") t = matchMedia("(prefers-color-scheme: dark)").matches ? "escuro" : "claro";
+      document.documentElement.dataset.tema = t;
+    } catch (e) {}
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="pagina-auth">
+  <button type="button" id="btn-tema" class="sec tema-auth"></button>
+
   <main class="auth">
     <header class="marca">
       <strong>NEXUS</strong>
