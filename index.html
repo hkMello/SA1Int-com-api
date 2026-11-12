@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Painel de controle de estoque de pastilhas da DDA Metalúrgica.">
   <title>Estoque de pastilhas · NEXUS</title>
+  <script>
+    // Aplica o tema antes de pintar a página (evita piscar claro → escuro).
+    try {
+      var t = localStorage.getItem("dda_tema");
+      if (t !== "claro" && t !== "escuro") t = matchMedia("(prefers-color-scheme: dark)").matches ? "escuro" : "claro";
+      document.documentElement.dataset.tema = t;
+    } catch (e) {}
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,6 +32,7 @@
     <div class="sessao">
       <span>Olá, <strong id="usuario-nome"></strong></span>
       <span id="usuario-papel" class="selo"></span>
+      <button type="button" id="btn-tema" class="sec"></button>
       <button type="button" id="btn-sair" class="sec">Sair</button>
     </div>
   </header>
