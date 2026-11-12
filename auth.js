@@ -57,12 +57,17 @@ const Auth = {
     const atual = Auth.usuarioAtual();
     if (!atual) return null;
     try {
-      iniciarSessao(await UsuariosAPI.buscarPorId(atual.id));
-    } catch (erro) {
-      if (erro.status === 404) {
+      // Usa a mesma consulta do login (por e-mail) em vez de GET /usuarios/:id.
+      const usuario = await UsuariosAPI.buscarPorEmail(atual.email);
+      if (!usuario) {
+        console.warn("[auth] o usuário da sessão não existe mais na API; encerrando a sessão.", atual.email);
         Auth.sair();
         return null;
       }
+      iniciarSessao(usuario);
+    } catch (erro) {
+      // Falha de rede ou da API não derruba a sessão.
+      console.warn("[auth] não foi possível atualizar a sessão:", erro.message);
     }
     return Auth.usuarioAtual();
   },
