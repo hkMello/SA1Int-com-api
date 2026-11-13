@@ -1,4 +1,3 @@
-// Helpers compartilhados por login.html e index.html.
 const $ = (id) => document.getElementById(id);
 
 function el(tag, props = {}, ...filhos) {
@@ -11,6 +10,24 @@ function el(tag, props = {}, ...filhos) {
   }
   no.append(...filhos.flat());
   return no;
+}
+
+const hojeISO = () => new Date().toLocaleDateString("sv-SE");
+
+function baixarCSV(nomeArquivo, linhas) {
+  const celula = (v) => {
+    let s = typeof v === "number" ? String(v).replace(".", ",") : String(v ?? "");
+    // Evita que o Excel interprete texto como fórmula.
+    if (typeof v === "string" && /^[=+\-@]/.test(s)) s = `'${s}`;
+    return /[;"\r\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
+  };
+  const texto = "﻿" + linhas.map((l) => l.map(celula).join(";")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([texto], { type: "text/csv;charset=utf-8" }));
+  const link = el("a", { href: url, download: nomeArquivo });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 const CHAVE_TEMA = "dda_tema";
