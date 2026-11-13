@@ -26,6 +26,8 @@
     <nav aria-label="Seções do painel">
       <a href="#resumo">Resumo</a>
       <a href="#estoque">Pastilhas</a>
+      <a href="#movimentacoes">Movimentações</a>
+      <a href="#relatorios">Relatórios</a>
       <a href="#busca">Buscar por ID</a>
       <a href="#usuarios" id="nav-usuarios" hidden>Usuários</a>
     </nav>
@@ -88,6 +90,128 @@
           </thead>
           <tbody id="tabela"></tbody>
         </table>
+      </div>
+    </section>
+
+    <section id="movimentacoes" aria-labelledby="t-mov">
+      <div class="cabecalho-secao">
+        <h2 id="t-mov">Movimentações</h2>
+        <div class="ferramentas">
+          <button type="button" id="btn-csv-mov" class="sec">Exportar CSV</button>
+          <button type="button" id="btn-mov" hidden>Registrar movimentação</button>
+        </div>
+      </div>
+
+      <div class="linha filtros">
+        <label for="mov-tipo" class="so-leitor">Tipo de movimentação</label>
+        <select id="mov-tipo">
+          <option value="">Entradas e saídas</option>
+          <option value="entrada">Somente entradas</option>
+          <option value="saida">Somente saídas</option>
+        </select>
+        <label for="mov-busca" class="so-leitor">Buscar movimentações</label>
+        <input id="mov-busca" type="search" placeholder="Modelo, código, motivo, responsável…">
+        <label for="mov-de">De</label>
+        <input id="mov-de" type="date">
+        <label for="mov-ate">até</label>
+        <input id="mov-ate" type="date">
+      </div>
+      <p id="mov-resumo" class="suave" role="status" aria-live="polite"></p>
+
+      <div class="rolagem">
+        <table>
+          <caption class="so-leitor">Histórico de entradas e saídas de pastilhas</caption>
+          <thead>
+            <tr>
+              <th scope="col">Data</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Modelo</th>
+              <th scope="col">Código</th>
+              <th scope="col" class="num">Qtd.</th>
+              <th scope="col" class="num">Saldo após</th>
+              <th scope="col" class="num">Valor</th>
+              <th scope="col">Motivo</th>
+              <th scope="col">Responsável</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-mov">
+            <tr><td class="mensagem" colspan="9">Carregando movimentações…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" id="mov-mais" class="sec" hidden>Mostrar mais</button>
+    </section>
+
+    <section id="relatorios" aria-labelledby="t-rel">
+      <h2 id="t-rel">Relatórios</h2>
+
+      <div class="relatorio" aria-labelledby="t-rel-consumo">
+        <div class="cabecalho-secao">
+          <h3 id="t-rel-consumo">Consumo por modelo</h3>
+          <div class="ferramentas">
+            <label for="rel-periodo" class="so-leitor">Período do consumo</label>
+            <select id="rel-periodo">
+              <option value="7">Últimos 7 dias</option>
+              <option value="30" selected>Últimos 30 dias</option>
+              <option value="90">Últimos 90 dias</option>
+              <option value="0">Todo o período</option>
+            </select>
+            <button type="button" id="btn-csv-consumo" class="sec">Exportar CSV</button>
+          </div>
+        </div>
+        <p class="nota">Soma as saídas registradas no período. Ajustes feitos pela edição da pastilha não entram no consumo.</p>
+        <div class="rolagem">
+          <table>
+            <caption class="so-leitor">Consumo de pastilhas por modelo</caption>
+            <thead>
+              <tr>
+                <th scope="col">Modelo</th>
+                <th scope="col">Código</th>
+                <th scope="col" class="num">Saídas</th>
+                <th scope="col" class="num">Unidades consumidas</th>
+                <th scope="col" class="num">Valor consumido</th>
+                <th scope="col" class="num">% do consumo</th>
+                <th scope="col" class="num">Estoque atual</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-consumo">
+              <tr><td class="mensagem" colspan="7">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="relatorio" aria-labelledby="t-rel-valor">
+        <div class="cabecalho-secao">
+          <h3 id="t-rel-valor">Valor em estoque</h3>
+          <div class="ferramentas">
+            <label for="rel-agrupar" class="so-leitor">Agrupar valor em estoque por</label>
+            <select id="rel-agrupar">
+              <option value="modelo">Por modelo</option>
+              <option value="categoria">Por categoria</option>
+              <option value="fornecedor">Por fornecedor</option>
+            </select>
+            <button type="button" id="btn-csv-valor" class="sec">Exportar CSV</button>
+          </div>
+        </div>
+        <p class="nota">Valor = quantidade em estoque × preço cadastrado de cada pastilha.</p>
+        <div class="rolagem">
+          <table>
+            <caption class="so-leitor">Valor em estoque agrupado</caption>
+            <thead>
+              <tr>
+                <th scope="col" id="th-grupo">Modelo</th>
+                <th scope="col" class="num">Modelos</th>
+                <th scope="col" class="num">Unidades</th>
+                <th scope="col" class="num">Valor em estoque</th>
+                <th scope="col" class="num">% do total</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-valor">
+              <tr><td class="mensagem" colspan="5">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -172,6 +296,44 @@
     </div>
   </dialog>
 
+  <dialog id="dlg-mov" aria-labelledby="dlg-mov-titulo">
+    <form id="form-mov">
+      <h2 id="dlg-mov-titulo">Registrar movimentação</h2>
+
+      <div class="campo">
+        <label for="m-pastilha">Pastilha</label>
+        <select id="m-pastilha" required></select>
+      </div>
+      <p id="m-saldo" class="resumo-usuario" hidden></p>
+
+      <div class="par">
+        <div class="campo">
+          <label for="m-tipo">Tipo</label>
+          <select id="m-tipo">
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="m-quantidade">Quantidade</label>
+          <input id="m-quantidade" type="number" min="1" step="1" inputmode="numeric" required>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="m-motivo">Motivo (opcional)</label>
+        <input id="m-motivo" maxlength="120" autocomplete="off" placeholder="Ex.: compra, consumo na linha 2">
+      </div>
+
+      <p id="m-erro" class="erro" role="alert" hidden></p>
+
+      <div class="acoes">
+        <button type="button" id="m-cancelar" class="sec">Cancelar</button>
+        <button type="submit" id="m-salvar">Registrar</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="dlg-usuario" aria-labelledby="dlg-usuario-titulo">
     <form id="form-usuario">
       <h2 id="dlg-usuario-titulo">Novo usuário</h2>
@@ -220,5 +382,7 @@
   <script src="auth.js"></script>
   <script src="app.js"></script>
   <script src="usuarios.js"></script>
+  <script src="movimentacoes.js"></script>
+  <script src="relatorios.js"></script>
 </body>
 </html>
