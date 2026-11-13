@@ -3,7 +3,7 @@ const API_URL = `${API_BASE}/pastilhas`;
 const USUARIOS_URL = `${API_BASE}/usuarios`;
 const API_BASE_HISTORICO = "https://6af65857e844c7ff741b4b55.mockapi.io/api_dda";
 const MOVIMENTACOES_URL = `${API_BASE_HISTORICO}/movimentacoes`;
-const historicoConfigurado = () => !API_BASE_HISTORICO.startsWith("https://6af65857e844c7ff741b4b55.mockapi.io/api_dda");
+const historicoConfigurado = () => !API_BASE_HISTORICO.startsWith("");
 
 async function requisicao(url, opcoes) {
   let resposta;
