@@ -274,3 +274,34 @@ dialog { max-height: calc(100dvh - 2rem); overflow-y: auto; }
   button.link { min-height: 2.25rem; }
   .pagina-auth { padding: 1rem; }
 }
+
+/* ---------- movimentações e relatórios ---------- */
+h3 { margin: 0; font-weight: 600; font-size: .95rem; }
+.filtros { margin-bottom: .25rem; }
+.filtros select, .ferramentas select { width: auto; }
+#mov-resumo { margin: .5rem 0 .9rem; }
+#mov-mais { margin-top: .75rem; }
+.relatorio + .relatorio { margin-top: 2rem; }
+.nota { margin: 0 0 .75rem; color: var(--suave); font-size: .85rem; }
+
+.selo.entrada { color: var(--ok); border-color: var(--ok); }
+.selo.saida { color: var(--alerta); border-color: var(--alerta); }
+
+tr.total td { font-weight: 600; }
+tr.total { background: var(--fundo); }
+
+.barra {
+  display: inline-block; width: 72px; height: 6px; margin-right: .4rem;
+  vertical-align: middle; background: var(--linha); border-radius: 999px; overflow: hidden;
+}
+.barra > span { display: block; height: 100%; background: var(--destaque); }
+
+@media (min-width: 721px) {
+  tr.total td { border-top: 1px solid var(--linha-forte); }
+}
+
+@media (max-width: 720px) {
+  .ferramentas select { flex: 1 1 auto; }
+  .filtros select { flex: 1 1 100%; }
+  .linha.filtros label:not(.so-leitor) { flex: 0 0 auto; }
+}
