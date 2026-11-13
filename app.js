@@ -114,6 +114,14 @@ function renderizar() {
     tabela.append(...lista.map(linhaPastilha));
   }
   atualizarResumo();
+  // Avisa os relatórios (relatorios.js) que o estoque mudou.
+  document.dispatchEvent(new CustomEvent("estoque-mudou"));
+}
+
+// Troca uma pastilha na lista local (ex.: depois de uma entrada/saída) e redesenha.
+function atualizarPastilhaLocal(atualizada) {
+  pastilhas = pastilhas.map((p) => (String(p.id) === String(atualizada.id) ? atualizada : p));
+  renderizar();
 }
 
 function atualizarResumo() {
@@ -206,17 +214,36 @@ formPastilha.addEventListener("submit", async (evento) => {
   $("form-erro").hidden = true;
 
   try {
+    let movimento = null; // { pastilha, delta, origem, motivo } para o histórico
     if (id) {
+      const anterior = pastilhas.find((p) => String(p.id) === String(id));
       const atualizada = await PastilhasAPI.atualizar(id, dados);
       pastilhas = pastilhas.map((p) => (String(p.id) === String(id) ? atualizada : p));
       mostrarStatus(`"${atualizada.nome}" atualizada.`);
+      if (anterior) {
+        movimento = {
+          pastilha: atualizada,
+          delta: Number(atualizada.quantidade) - Number(anterior.quantidade),
+          origem: "ajuste",
+          motivo: "Ajuste na edição da pastilha",
+        };
+      }
     } else {
       const nova = await PastilhasAPI.criar(dados);
       pastilhas.push(nova);
       mostrarStatus(`"${nova.nome}" cadastrada.`);
+      movimento = {
+        pastilha: nova,
+        delta: Number(nova.quantidade),
+        origem: "cadastro",
+        motivo: "Cadastro inicial",
+      };
     }
     dlgForm.close();
     renderizar();
+    if (movimento) {
+      await registrarMovimentoAutomatico(movimento.pastilha, movimento.delta, movimento.origem, movimento.motivo);
+    }
   } catch (erro) {
     $("form-erro").textContent = `Não foi possível salvar. ${erro.message}`;
     $("form-erro").hidden = false;
@@ -272,7 +299,6 @@ async function iniciar() {
 }
 
 aplicarSessao();
-// Os scripts ficam no fim do <body>, mas não dependemos disso.
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", iniciar);
 } else {
