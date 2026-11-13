@@ -6,6 +6,7 @@ const PERMISSOES = [
   { id: "criar", rotulo: "Cadastrar pastilhas" },
   { id: "editar", rotulo: "Editar pastilhas" },
   { id: "excluir", rotulo: "Excluir pastilhas" },
+  { id: "movimentar", rotulo: "Registrar entradas e saídas" },
 ];
 const PAPEIS = { admin: "Administrador", usuario: "Usuário" };
 
